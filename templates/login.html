@@ -7,6 +7,7 @@
   </div>
 
   <form id="form-student" method="post" class="space-y-3">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="login_type" value="student">
     <select name="grade" class="w-full border rounded p-2" required>
       <option value="">Select Class</option>
@@ -18,6 +19,7 @@
   </form>
 
   <form id="form-staff" method="post" class="space-y-3 hidden">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <input type="hidden" name="login_type" value="staff">
     <input name="username" placeholder="Username" class="w-full border rounded p-2" required>
     <input name="password" type="password" placeholder="Password" class="w-full border rounded p-2" required>

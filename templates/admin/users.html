@@ -3,12 +3,13 @@
 {% block content %}
 <div class="flex justify-between items-center mt-4 mb-4">
   <h1 class="text-xl font-bold">👤 User Management</h1>
-  <a href="{{ url_for('admin_home') }}" class="underline text-sky-700">← Dashboard</a>
+  <a href="{{ url_for('auth.admin_home') }}" class="underline text-sky-700">← Dashboard</a>
 </div>
 
 <div class="grid md:grid-cols-3 gap-4 mb-6">
   <!-- Add student -->
-  <form method="post" action="{{ url_for('admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+  <form method="post" action="{{ url_for('admin.admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 class="font-bold">Add Student</h2>
     <input type="hidden" name="role" value="student">
     <input name="name" placeholder="Student name" class="w-full border rounded p-2" required>
@@ -20,7 +21,8 @@
   </form>
 
   <!-- Add teacher -->
-  <form method="post" action="{{ url_for('admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+  <form method="post" action="{{ url_for('admin.admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 class="font-bold">Add Teacher</h2>
     <input type="hidden" name="role" value="teacher">
     <input name="name" placeholder="Teacher name" class="w-full border rounded p-2" required>
@@ -30,7 +32,8 @@
   </form>
 
   <!-- CSV import -->
-  <form method="post" action="{{ url_for('admin_import_csv') }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-4 space-y-2">
+  <form method="post" action="{{ url_for('admin.admin_import_csv') }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 class="font-bold">Import Class (CSV)</h2>
     <p class="text-sm text-gray-600">Columns: <code>name,class,roll</code></p>
     <input type="file" name="csv_file" accept=".csv" class="w-full text-sm" required>
@@ -73,13 +76,16 @@
           {% else %}<span class="text-green-700">Active</span>{% endif %}
         </td>
         <td class="p-2 flex gap-1 flex-wrap">
-          <form method="post" action="{{ url_for('admin_reset_pin', uid=u.id) }}"
+          <form method="post" action="{{ url_for('admin.admin_reset_pin', uid=u.id) }}"
                 onsubmit="return confirm('Reset login for {{ u.name|e }}?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="px-2 py-1 bg-yellow-400 rounded">Reset</button></form>
-          <form method="post" action="{{ url_for('admin_toggle_user', uid=u.id) }}">
+          <form method="post" action="{{ url_for('admin.admin_toggle_user', uid=u.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="px-2 py-1 bg-gray-300 rounded">{{ 'Deactivate' if u.active else 'Activate' }}</button></form>
-          <form method="post" action="{{ url_for('admin_delete_user', uid=u.id) }}"
+          <form method="post" action="{{ url_for('admin.admin_delete_user', uid=u.id) }}"
                 onsubmit="return confirm('Permanently delete {{ u.name|e }} and all their scores?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="px-2 py-1 bg-red-500 text-white rounded">Delete</button></form>
         </td>
       </tr>
