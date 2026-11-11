@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="bg-white rounded-xl shadow p-6 mt-6">
+  <div class="flex mb-4 gap-2">
+    <button onclick="show('student')" id="tab-student" class="flex-1 py-2 rounded bg-sky-600 text-white">🎒 Student</button>
+    <button onclick="show('staff')" id="tab-staff" class="flex-1 py-2 rounded bg-gray-200">👩‍🏫 Staff</button>
+  </div>
+
+  <form id="form-student" method="post" class="space-y-3">
+    <input type="hidden" name="login_type" value="student">
+    <select name="grade" class="w-full border rounded p-2" required>
+      <option value="">Select Class</option>
+      <option>5</option><option>6</option><option>7</option>
+    </select>
+    <input name="roll" type="number" placeholder="Roll Number" class="w-full border rounded p-2" required>
+    <input name="pin" type="password" inputmode="numeric" maxlength="4" placeholder="4-digit PIN" class="w-full border rounded p-2" required>
+    <button class="w-full bg-sky-600 text-white py-2 rounded">Login</button>
+  </form>
+
+  <form id="form-staff" method="post" class="space-y-3 hidden">
+    <input type="hidden" name="login_type" value="staff">
+    <input name="username" placeholder="Username" class="w-full border rounded p-2" required>
+    <input name="password" type="password" placeholder="Password" class="w-full border rounded p-2" required>
+    <button class="w-full bg-sky-600 text-white py-2 rounded">Login</button>
+  </form>
+</div>
+<script>
+  function show(which) {
+    document.getElementById('form-student').classList.toggle('hidden', which !== 'student');
+    document.getElementById('form-staff').classList.toggle('hidden', which !== 'staff');
+    document.getElementById('tab-student').className = 'flex-1 py-2 rounded ' + (which === 'student' ? 'bg-sky-600 text-white' : 'bg-gray-200');
+    document.getElementById('tab-staff').className = 'flex-1 py-2 rounded ' + (which === 'staff' ? 'bg-sky-600 text-white' : 'bg-gray-200');
+  }
+</script>
+{% endblock %}
