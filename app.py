@@ -25,9 +25,9 @@ def create_app():
             cur.close()
 
     # Blueprints (members: the Leader registers yours here)
-    from blueprints import auth, admin
-    app.register_blueprint(auth.bp)
-    app.register_blueprint(admin.bp)
+    from blueprints import auth, admin, library, ai, student, dashboards
+    for module in (auth, admin, library, ai, student, dashboards):
+        app.register_blueprint(module.bp)
 
     # Seed admin account
     with app.app_context():
@@ -62,3 +62,4 @@ app = create_app()
 
 if __name__ == "__main__":
     app.run(debug=True)
+    
