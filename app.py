@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_wtf.csrf import CSRFError
 from sqlalchemy import event
 
@@ -54,6 +54,11 @@ def create_app():
     def csrf_error(_):
         return render_template("error.html", title="Session Expired",
                                message="Please go back, refresh the page and try again."), 400
+
+    @app.errorhandler(413)
+    def payload_too_large(_):
+        return render_template("error.html", title="File Too Large",
+                               message="Maximum upload size is 25 MB."), 413
 
     return app
 
