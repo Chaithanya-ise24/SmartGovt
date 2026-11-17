@@ -56,10 +56,9 @@ def create_app():
                                message="Please go back, refresh the page and try again."), 400
 
     @app.errorhandler(413)
-    def payload_too_large(_):
+    def too_large(_):
         return render_template("error.html", title="File Too Large",
-                               message="Maximum upload size is 25 MB."), 413
-
+                               message="That file is bigger than 25 MB. Please upload a smaller PDF."), 413
     return app
 
 

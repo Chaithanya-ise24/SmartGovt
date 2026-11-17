@@ -3,94 +3,131 @@
 {% block main_class %}max-w-4xl{% endblock %}
 
 {% block content %}
-<h1>📂 Document Management</h1>
+<div class="bg-white p-6 rounded-xl shadow-sm border border-sky-100">
+  <h1 class="text-2xl font-bold text-sky-900 mb-4">📂 Document Management</h1>
 
-<hr>
+  <hr class="border-sky-100 mb-6">
 
-<h2 class="mt-4">Upload New PDF</h2>
-<form method="POST" action="{{ url_for('library.upload_resource') }}" enctype="multipart/form-data" class="mt-2">
-  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <h2 class="text-lg font-semibold text-sky-800 mb-3">Upload New PDF</h2>
+  <form method="POST" action="{{ url_for('library.upload') }}" enctype="multipart/form-data" class="space-y-4">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
-  <div class="row g-3 align-items-end">
-    <div class="col-md-6">
-      <label class="form-label">Title <span class="text-danger">*</span></label>
-      <input type="text" name="title" class="form-control" required maxlength="200" placeholder="e.g., Maths Chapter 1">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+      <div class="md:col-span-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Title <span class="text-red-600">*</span></label>
+        <input type="text" name="title" required maxlength="200" placeholder="e.g., Maths Chapter 1"
+               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-sky-500">
+      </div>
+
+      <div class="md:col-span-3">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Category <span class="text-red-600">*</span></label>
+        <select name="category" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="">Choose…</option>
+          {% for c in categories %}
+            <option value="{{ c }}">{{ c }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="md:col-span-3">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Class <span class="text-red-600">*</span></label>
+        <select name="class_name" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="">Choose…</option>
+          {% for cl in classes %}
+            <option value="{{ cl }}">Class {{ cl }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="md:col-span-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">Subject <span class="text-red-600">*</span></label>
+        <select name="subject" required
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+          <option value="">Choose…</option>
+          {% for s in subjects %}
+            <option value="{{ s }}">{{ s }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="md:col-span-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">PDF File <span class="text-red-600">*</span> (max 25 MB)</label>
+        <input type="file" name="pdf" accept=".pdf,application/pdf" required
+               class="w-full border border-gray-300 rounded-lg px-3 py-1.5 text-sm bg-gray-50 file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:bg-sky-100 file:text-sky-700 hover:file:bg-sky-200">
+      </div>
     </div>
 
-    <div class="col-md-3">
-      <label class="form-label">Category <span class="text-danger">*</span></label>
-      <select name="category" class="form-select" required>
-        <option value="">Choose…</option>
-        <option value="Textbook">Textbook</option>
-        <option value="Notes">Notes</option>
-        <option value="Worksheet">Worksheet</option>
+    <div>
+      <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white font-medium px-5 py-2 rounded-lg text-sm transition">
+        ⬆️ Upload PDF
+      </button>
+    </div>
+  </form>
+
+  <hr class="border-sky-100 my-6">
+
+  <div class="flex flex-wrap justify-between items-center gap-3 mb-3">
+    <h2 class="text-lg font-semibold text-sky-800">Existing Documents</h2>
+
+    {# Filter by Class #}
+    <form method="GET" action="{{ url_for('library.documents') }}" class="flex items-center gap-2">
+      <select name="grade" onchange="this.form.submit()"
+              class="border border-gray-300 rounded-lg px-3 py-1.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-sky-500">
+        <option value="">All Classes</option>
+        {% for cl in classes %}
+          <option value="{{ cl }}" {{ 'selected' if grade == cl }}>Class {{ cl }}</option>
+        {% endfor %}
       </select>
-    </div>
-
-    <div class="col-md-3">
-      <label class="form-label">Class <span class="text-danger">*</span></label>
-      <select name="class_name" class="form-select" required>
-        <option value="">Choose…</option>
-        <option value="5">Class 5</option>
-        <option value="6">Class 6</option>
-        <option value="7">Class 7</option>
-      </select>
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">Subject (optional)</label>
-      <input type="text" name="subject" class="form-control" maxlength="50" placeholder="e.g., Mathematics">
-    </div>
-
-    <div class="col-md-6">
-      <label class="form-label">PDF File <span class="text-danger">*</span> (max 25 MB)</label>
-      <input type="file" name="pdf_file" class="form-control" accept=".pdf,application/pdf" required>
-    </div>
-
-    <div class="col-12">
-      <button type="submit" class="btn btn-primary">Upload PDF</button>
-    </div>
+    </form>
   </div>
-</form>
 
-<hr class="mt-4">
-
-<h2 class="mt-4">Existing Documents</h2>
-<table class="table table-striped table-hover">
-  <thead class="table-light">
-    <tr>
-      <th>Title</th>
-      <th>Category</th>
-      <th>Class</th>
-      <th>Subject</th>
-      <th>Uploaded</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-  {% for resource in resources %}
-    <tr>
-      <td>{{ resource.title }}</td>
-      <td><span class="badge bg-secondary">{{ resource.category }}</span></td>
-      <td>Class {{ resource.class_name }}</td>
-      <td>{{ resource.subject or "—" }}</td>
-      <td><small class="text-muted">{{ resource.uploaded_at.strftime("%Y-%m-%d %H:%M") if resource.uploaded_at else "—" }}</small></td>
-      <td class="text-end">
-        {# Teachers can only delete their own; admins can delete any #}
-        {% if can_delete_any or resource.uploaded_by == g.user.id %}
-        <form method="POST" action="{{ url_for('library.delete_resource', resource_id=resource.id) }}" class="d-inline" onsubmit="return confirm('Delete this document permanently?');">
-          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-        </form>
-        {% else %}
-          <span class="badge bg-light text-muted">other teacher</span>
-        {% endif %}
-      </td>
-    </tr>
-  {% else %}
-    <tr><td colspan="6" class="text-muted">No documents uploaded yet.</td></tr>
-  {% endfor %}
-  </tbody>
-</table>
-
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse text-sm">
+      <thead>
+        <tr class="bg-sky-50 text-sky-900 border-b border-sky-200">
+          <th class="p-3 font-semibold">Title</th>
+          <th class="p-3 font-semibold">Category</th>
+          <th class="p-3 font-semibold">Class</th>
+          <th class="p-3 font-semibold">Subject</th>
+          <th class="p-3 font-semibold">Uploaded By</th>
+          <th class="p-3 font-semibold">Date</th>
+          <th class="p-3 font-semibold text-right">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+      {% for resource in files %}
+        <tr class="hover:bg-sky-50/50">
+          <td class="p-3 font-medium text-gray-800">
+            <a href="{{ url_for('library.view_page', rid=resource.id) }}" class="text-sky-700 hover:underline">
+              {{ resource.title }}
+            </a>
+          </td>
+          <td class="p-3">
+            <span class="px-2 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800">{{ resource.category }}</span>
+          </td>
+          <td class="p-3 text-gray-700">Class {{ resource.class_name }}</td>
+          <td class="p-3 text-gray-600">{{ resource.subject or "—" }}</td>
+          <td class="p-3 text-xs text-gray-600">{{ uploaders.get(resource.uploaded_by, "Staff") }}</td>
+          <td class="p-3 text-xs text-gray-500">{{ resource.uploaded_at.strftime("%Y-%m-%d %H:%M") if resource.uploaded_at else "—" }}</td>
+          <td class="p-3 text-right">
+            {# Teachers can only delete their own; admins can delete any #}
+            {% if g.user.role == "admin" or resource.uploaded_by == g.user.id %}
+            <form method="POST" action="{{ url_for('library.delete', rid=resource.id) }}" class="inline" onsubmit="return confirm('Delete this document permanently?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-xs font-medium">🗑️ Delete</button>
+            </form>
+            {% else %}
+              <span class="px-2 py-1 rounded bg-gray-100 text-gray-500 text-xs">other teacher</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% else %}
+        <tr><td colspan="7" class="p-4 text-center text-gray-500">No documents uploaded yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
