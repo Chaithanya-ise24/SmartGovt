@@ -8,7 +8,7 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(basedir, "school.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    UPLOAD_FOLDER = os.path.join(basedir, "static", "uploads", "pdfs")
+    UPLOAD_FOLDER = os.path.join(basedir, "uploads", "pdfs")
     MAX_CONTENT_LENGTH = 25 * 1024 * 1024  # 25 MB uploads
 
     SESSION_COOKIE_HTTPONLY = True

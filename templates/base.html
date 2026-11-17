@@ -3,15 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>SmartGov School</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="{{ url_for('static', filename='js/api.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/speech.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/i18n.js') }}"></script>
 </head>
 <body class="bg-sky-50 min-h-screen">
-  <nav class="bg-sky-600 text-white p-4 flex justify-between items-center">
+  <nav class="bg-sky-600 text-white p-4 flex flex-wrap gap-3 justify-between items-center">
+    <div class="flex flex-wrap gap-4 items-center">
     <span class="font-bold text-lg">🏫 SmartGov School – GHPS Varthur</span>
-    {% if g.user %}
-      <span>{{ g.user.name }} ({{ g.user.role }}) · <a class="underline" href="{{ url_for('logout') }}">Logout</a></span>
-    {% endif %}
+      {% if g.user %}
+        {% block nav_links %}
+          {% if g.user.role == 'student' %}
+            <a class="underline" href="{{ url_for('auth.student_home') }}">Home</a>
+            <a class="underline" href="{{ url_for('library.library') }}">Library</a>
+            {# Members add student links here, e.g. Chat, Quiz, Progress #}
+          {% elif g.user.role == 'teacher' %}
+            <a class="underline" href="{{ url_for('auth.teacher_home') }}">Home</a>
+            <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
+          {% elif g.user.role == 'admin' %}
+            <a class="underline" href="{{ url_for('auth.admin_home') }}">Home</a>
+            <a class="underline" href="{{ url_for('admin.admin_users') }}">Users</a>
+            <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
+          {% endif %}
+        {% endblock %}
+      {% endif %}
+    </div>
+    <div class="flex gap-3 items-center">
+      <button id="lang-toggle" class="bg-white/20 px-2 py-1 rounded text-sm hidden">ಕನ್ನಡ / EN</button>
+      {% if g.user %}
+        <span>{{ g.user.name }} ({{ g.user.role }}) · <a class="underline" href="{{ url_for('auth.logout') }}">Logout</a></span>
+      {% endif %}
+    </div>
   </nav>
   <main class="{% block main_class %}max-w-md{% endblock %} mx-auto p-4">
     {% with messages = get_flashed_messages(with_categories=true) %}
@@ -21,5 +46,30 @@
     {% endwith %}
     {% block content %}{% endblock %}
   </main>
+
+      <script>
+    // Puts an eye icon inside the right edge of every password box
+    document.querySelectorAll('input[type="password"]').forEach(function (input) {
+      var wrap = document.createElement('div');
+      wrap.className = 'relative w-full';
+      input.parentNode.insertBefore(wrap, input);
+      wrap.appendChild(input);
+      input.classList.add('pr-10');            // keeps typed text clear of the icon
+
+      var btn = document.createElement('button');
+      btn.type = 'button';                     // never submits the form
+      btn.textContent = '👁';
+      btn.title = 'Show or hide';
+      btn.setAttribute('aria-label', 'Show or hide password');
+      btn.className = 'absolute inset-y-0 right-0 px-3 flex items-center text-lg';
+      wrap.appendChild(btn);
+
+      btn.addEventListener('click', function () {
+        var isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        btn.textContent = isHidden ? '🙈' : '👁';
+      });
+    });
+  </script>
 </body>
 </html>

@@ -1,0 +1,1 @@
+function t(key) { return key; }

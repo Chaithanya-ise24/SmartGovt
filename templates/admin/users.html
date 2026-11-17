@@ -3,12 +3,13 @@
 {% block content %}
 <div class="flex justify-between items-center mt-4 mb-4">
   <h1 class="text-xl font-bold">👤 User Management</h1>
-  <a href="{{ url_for('admin_home') }}" class="underline text-sky-700">← Dashboard</a>
+  <a href="{{ url_for('auth.admin_home') }}" class="underline text-sky-700">← Dashboard</a>
 </div>
 
 <div class="grid md:grid-cols-3 gap-4 mb-6">
   <!-- Add student -->
-  <form method="post" action="{{ url_for('admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+  <form method="post" action="{{ url_for('admin.admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 class="font-bold">Add Student</h2>
     <input type="hidden" name="role" value="student">
     <input name="name" placeholder="Student name" class="w-full border rounded p-2" required>
@@ -20,7 +21,8 @@
   </form>
 
   <!-- Add teacher -->
-  <form method="post" action="{{ url_for('admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+  <form method="post" action="{{ url_for('admin.admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 class="font-bold">Add Teacher</h2>
     <input type="hidden" name="role" value="teacher">
     <input name="name" placeholder="Teacher name" class="w-full border rounded p-2" required>
@@ -30,7 +32,8 @@
   </form>
 
   <!-- CSV import -->
-  <form method="post" action="{{ url_for('admin_import_csv') }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-4 space-y-2">
+  <form method="post" action="{{ url_for('admin.admin_import_csv') }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <h2 class="font-bold">Import Class (CSV)</h2>
     <p class="text-sm text-gray-600">Columns: <code>name,class,roll</code></p>
     <input type="file" name="csv_file" accept=".csv" class="w-full text-sm" required>
@@ -58,7 +61,8 @@
   <table class="w-full text-sm">
     <thead class="bg-sky-100 text-left">
       <tr><th class="p-2">Name</th><th class="p-2">Role</th><th class="p-2">Class</th>
-          <th class="p-2">Roll / Username</th><th class="p-2">Status</th><th class="p-2">Actions</th></tr>
+          <th class="p-2">Roll / Username</th><th class="p-2">PIN / Password</th>
+          <th class="p-2">Status</th><th class="p-2">Actions</th></tr>
     </thead>
     <tbody>
     {% for u in users %}
@@ -67,26 +71,54 @@
         <td class="p-2">{{ u.role }}</td>
         <td class="p-2">{{ u.class_name or '-' }}</td>
         <td class="p-2">{{ u.roll_no if u.role == 'student' else u.username }}</td>
+        <td class="p-2 whitespace-nowrap">
+          {% if u.role == 'student' and u.must_change_password %}
+            {% set real = default_pin %}
+          {% elif u.role == 'student' %}
+            {% set real = 'Set by user' %}
+          {% elif u.must_change_password %}
+            {% set real = 'Temporary (shown once)' %}
+          {% else %}
+            {% set real = 'Set by user' %}
+          {% endif %}
+          <span class="pin-text font-mono" data-real="{{ real }}">••••</span>
+          <button type="button" class="pin-toggle ml-1" title="Show or hide">👁</button>
+        </td>
         <td class="p-2">
           {% if not u.active %}<span class="text-red-600">Deactivated</span>
           {% elif u.is_locked() %}<span class="text-orange-600">Locked</span>
           {% else %}<span class="text-green-700">Active</span>{% endif %}
         </td>
         <td class="p-2 flex gap-1 flex-wrap">
-          <form method="post" action="{{ url_for('admin_reset_pin', uid=u.id) }}"
+          <form method="post" action="{{ url_for('admin.admin_reset_pin', uid=u.id) }}"
                 onsubmit="return confirm('Reset login for {{ u.name|e }}?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="px-2 py-1 bg-yellow-400 rounded">Reset</button></form>
-          <form method="post" action="{{ url_for('admin_toggle_user', uid=u.id) }}">
+          <form method="post" action="{{ url_for('admin.admin_toggle_user', uid=u.id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="px-2 py-1 bg-gray-300 rounded">{{ 'Deactivate' if u.active else 'Activate' }}</button></form>
-          <form method="post" action="{{ url_for('admin_delete_user', uid=u.id) }}"
+          <form method="post" action="{{ url_for('admin.admin_delete_user', uid=u.id) }}"
                 onsubmit="return confirm('Permanently delete {{ u.name|e }} and all their scores?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <button class="px-2 py-1 bg-red-500 text-white rounded">Delete</button></form>
         </td>
       </tr>
     {% else %}
-      <tr><td colspan="6" class="p-4 text-center text-gray-500">No users found.</td></tr>
+      <tr><td colspan="7" class="p-4 text-center text-gray-500">No users found.</td></tr>
     {% endfor %}
     </tbody>
   </table>
 </div>
+
+<script>
+  // Per-row show/hide for the PIN / Password column
+  document.querySelectorAll('.pin-toggle').forEach(function (btn) {
+    var text = btn.parentNode.querySelector('.pin-text');
+    btn.addEventListener('click', function () {
+      var hidden = text.textContent === '••••';
+      text.textContent = hidden ? text.dataset.real : '••••';
+      btn.textContent = hidden ? '🙈' : '👁';
+    });
+  });
+</script>
 {% endblock %}

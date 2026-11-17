@@ -1,0 +1,35 @@
+{# SmartGov School PDF Viewer #}
+{% extends "base.html" %}
+{% block main_class %}max-w-none{% endblock %}
+
+{% block content %}
+<div class="mb-4 flex justify-between items-center">
+  <div>
+    <h1>📄 {{ resource.title }}</h1>
+    <p class="text-muted">
+      <span class="badge bg-secondary">{{ resource.category }}</span>
+      {% if resource.subject %}<span class="badge bg-info ms-1">{{ resource.subject }}</span>{% endif %}
+      Class {{ resource.class_name }}
+    </p>
+  </div>
+  <a href="{{ url_for('library.download_resource', resource_id=resource.id) }}" class="btn btn-success">
+    ⬇ Download
+  </a>
+</div>
+
+{# PDF iframe — fills available height #}
+<div class="ratio ratio-4x3 rounded overflow-hidden bg-white shadow-sm">
+  <iframe
+    src="{{ url_for('library.file_resource', resource_id=resource.id) }}"
+    title="{{ resource.title }}"
+    class="w-100 h-100 border-0"
+    allow="fullscreen"
+    loading="lazy">
+  </iframe>
+</div>
+
+<p class="mt-2 text-muted small">
+  If the PDF does not load, <a href="{{ url_for('library.download_resource', resource_id=resource.id) }}">download it instead</a>.
+</p>
+
+{% endblock %}
