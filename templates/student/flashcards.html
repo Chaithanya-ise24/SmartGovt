@@ -1,0 +1,311 @@
+
+{% extends "base.html" %}
+
+{% block main_class %}max-w-3xl{% endblock %}
+
+{% block content %}
+
+<div class="bg-white rounded-2xl shadow-lg p-6 mt-6">
+
+<a href="{{ url_for('auth.student_home') }}"     class="text-sky-600 font-semibold">
+    ← Back to Dashboard
+  </a>
+
+  <h1 class="text-3xl font-bold text-sky-700 mt-5 text-center">
+    📚 My Flashcards
+  </h1>
+
+  <p class="text-gray-600 text-center mt-2">
+    Learn something new, one card at a time!
+  </p>
+
+  <!-- Subject Selection -->
+  <div class="mt-6">
+    <label class="font-semibold text-gray-700">
+      Choose Subject
+    </label>
+
+    <select id="subjectSelect"
+            onchange="changeSubject()"
+            class="w-full border rounded-lg p-3 mt-2">
+      <option value="Science">🔬 Science</option>
+      <option value="Mathematics">➗ Mathematics</option>
+      <option value="Social Science">🌍 Social Science</option>
+      <option value="English">📖 English</option>
+    </select>
+  </div>
+
+  <!-- Progress -->
+  <div class="flex justify-between mt-6 text-sm font-semibold">
+    <span id="cardCount">Card 1 of 5</span>
+
+    <span class="text-green-600" id="learnedCount">
+      Learned: 0
+    </span>
+  </div>
+
+  <div class="w-full bg-gray-200 rounded-full h-2 mt-2">
+    <div id="progressBar"
+         class="bg-green-500 h-2 rounded-full transition-all"
+         style="width: 0%">
+    </div>
+  </div>
+
+  <!-- Flashcard -->
+  <button id="flashcard"
+          type="button"
+          onclick="flipCard()"
+          class="w-full min-h-64 mt-6 bg-sky-100 hover:bg-sky-200 rounded-2xl p-8 text-center flex flex-col justify-center items-center transition">
+
+    <span id="cardLabel"
+          class="text-sm text-sky-700 font-semibold mb-4">
+      QUESTION
+    </span>
+
+    <span id="cardText"
+          class="text-2xl font-bold text-gray-800">
+    </span>
+
+    <span class="text-sm text-gray-500 mt-6">
+      Tap the card to reveal the answer
+    </span>
+
+  </button>
+
+  <!-- Buttons -->
+  <div class="grid grid-cols-2 gap-4 mt-6">
+
+    <button type="button"
+            onclick="reviewAgain()"
+            class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-3 rounded-xl">
+      🔄 Review Again
+    </button>
+
+    <button type="button"
+            onclick="gotIt()"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl">
+      ✅ Got It!
+    </button>
+
+  </div>
+
+  <p id="feedback"
+     class="text-center font-semibold text-sky-700 mt-5">
+  </p>
+
+</div>
+
+<script>
+
+// Flashcard Questions by Subject
+const subjectCards = {
+
+  "Science": [
+    {
+      question: "What is the largest planet in our solar system?",
+      answer: "Jupiter is the largest planet in our solar system."
+    },
+    {
+      question: "What is photosynthesis?",
+      answer: "Photosynthesis is the process by which green plants make food using sunlight."
+    },
+    {
+      question: "Which gas do humans need to breathe?",
+      answer: "Humans need oxygen to breathe."
+    },
+    {
+      question: "What is the boiling point of water?",
+      answer: "Water boils at 100°C at standard atmospheric pressure."
+    },
+    {
+      question: "Which organ pumps blood throughout the body?",
+      answer: "The heart pumps blood throughout the human body."
+    }
+  ],
+
+  "Mathematics": [
+    {
+      question: "What is 12 × 5?",
+      answer: "12 × 5 = 60."
+    },
+    {
+      question: "How many sides does a triangle have?",
+      answer: "A triangle has 3 sides."
+    },
+    {
+      question: "What is the square of 8?",
+      answer: "8 × 8 = 64."
+    },
+    {
+      question: "What is 100 divided by 4?",
+      answer: "100 ÷ 4 = 25."
+    },
+    {
+      question: "What is the value of π approximately?",
+      answer: "π is approximately equal to 3.14."
+    }
+  ],
+
+  "Social Science": [
+    {
+      question: "What is the capital of India?",
+      answer: "New Delhi is the capital of India."
+    },
+    {
+      question: "Who is known as the Father of the Nation in India?",
+      answer: "Mahatma Gandhi is known as the Father of the Nation in India."
+    },
+    {
+      question: "When did India become independent?",
+      answer: "India became independent on 15 August 1947."
+    },
+    {
+      question: "What is the national animal of India?",
+      answer: "The Bengal tiger is the national animal of India."
+    },
+    {
+      question: "How many colours are there in the Indian national flag?",
+      answer: "There are three colours: saffron, white and green."
+    }
+  ],
+
+  "English": [
+    {
+      question: "What is a noun?",
+      answer: "A noun is the name of a person, place, animal or thing."
+    },
+    {
+      question: "What is a verb?",
+      answer: "A verb is a word that expresses an action or state."
+    },
+    {
+      question: "What is the opposite of happy?",
+      answer: "The opposite of happy is sad."
+    },
+    {
+      question: "What is a synonym?",
+      answer: "A synonym is a word that has the same or nearly the same meaning as another word."
+    },
+    {
+      question: "What is the plural of child?",
+      answer: "The plural of child is children."
+    }
+  ]
+
+};
+
+let cards = subjectCards["Science"];
+let currentCard = 0;
+let isFlipped = false;
+let learned = 0;
+
+function showCard() {
+
+  const card = cards[currentCard];
+
+  document.getElementById("cardText").textContent =
+    isFlipped ? card.answer : card.question;
+
+  document.getElementById("cardLabel").textContent =
+    isFlipped ? "ANSWER" : "QUESTION";
+
+  document.getElementById("cardCount").textContent =
+    `Card ${currentCard + 1} of ${cards.length}`;
+
+  document.getElementById("learnedCount").textContent =
+    `Learned: ${learned}`;
+
+  document.getElementById("progressBar").style.width =
+    `${(learned / cards.length) * 100}%`;
+
+}
+
+function flipCard() {
+
+  isFlipped = !isFlipped;
+
+  showCard();
+
+}
+
+function gotIt() {
+
+  if (!isFlipped) {
+
+    document.getElementById("feedback").textContent =
+      "Flip the card to see the answer first!";
+
+    return;
+
+  }
+
+  learned++;
+
+  if (currentCard === cards.length - 1) {
+
+    document.getElementById("cardLabel").textContent =
+      "COMPLETED";
+
+    document.getElementById("cardText").textContent =
+      "🎉 Amazing! You completed all the flashcards!";
+
+    document.getElementById("learnedCount").textContent =
+      `Learned: ${learned}`;
+
+    document.getElementById("progressBar").style.width = "100%";
+
+    document.getElementById("flashcard").disabled = true;
+
+    document.getElementById("feedback").textContent =
+      "Excellent work! Keep learning! 🌟";
+
+    return;
+
+  }
+
+  currentCard++;
+  isFlipped = false;
+
+  document.getElementById("feedback").textContent =
+    "Great job! Keep learning! 🌟";
+
+  showCard();
+
+}
+
+function reviewAgain() {
+
+  isFlipped = false;
+
+  document.getElementById("feedback").textContent =
+    "No problem! Let's try this card again.";
+
+  showCard();
+
+}
+
+function changeSubject() {
+
+  const subject = document.getElementById("subjectSelect").value;
+
+  cards = subjectCards[subject];
+
+  currentCard = 0;
+  learned = 0;
+  isFlipped = false;
+
+  document.getElementById("flashcard").disabled = false;
+
+  document.getElementById("feedback").textContent =
+    `Let's learn ${subject}!`;
+
+  showCard();
+
+}
+
+// Display first card
+showCard();
+
+</script>
+
+{% endblock %}

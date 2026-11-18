@@ -1,11 +1,34 @@
 {% extends "base.html" %}
-{% block content %}
-<div class="bg-white rounded-xl shadow p-6 mt-6">
-  <h1 class="text-xl font-bold">{{ title }}</h1>
-  {% if g.user and g.user.role == 'admin' %}
-    <a href="{{ url_for('admin.admin_users') }}" class="inline-block mt-4 bg-sky-600 text-white px-4 py-2 rounded">👤 Manage Users</a>
+
+{% block main_class %}
+  {% if g.user and g.user.role == 'student' %}
+    max-w-6xl
   {% else %}
-    <p class="text-gray-600 mt-2">Features coming soon.</p>
+    max-w-md
   {% endif %}
-</div>
+{% endblock %}
+
+{% block content %}
+
+{% if g.user and g.user.role == 'student' %}
+
+  {% include "student/home_content.html" %}
+
+{% else %}
+
+  <div class="bg-white rounded-xl shadow p-6 mt-6">
+    <h1 class="text-xl font-bold">{{ title }}</h1>
+
+    {% if g.user and g.user.role == 'admin' %}
+      <a href="{{ url_for('admin.admin_users') }}"
+         class="inline-block mt-4 bg-sky-600 text-white px-4 py-2 rounded">
+        👤 Manage Users
+      </a>
+    {% else %}
+      <p class="text-gray-600 mt-2">Features coming soon.</p>
+    {% endif %}
+  </div>
+
+{% endif %}
+
 {% endblock %}

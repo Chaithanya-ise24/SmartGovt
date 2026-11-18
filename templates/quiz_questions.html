@@ -1,0 +1,58 @@
+
+{% extends "base.html" %}
+
+{% block main_class %}max-w-3xl{% endblock %}
+
+{% block content %}
+
+<div class="bg-white rounded-2xl shadow-lg p-6 mt-6">
+
+    <a href="{{ url_for('auth.student_home') }}"
+       class="text-sky-600 font-semibold">
+        ← Back to Dashboard
+    </a>
+
+    <h1 class="text-3xl font-bold text-sky-700 mt-5">
+        📝 {{ subject }} Quiz
+    </h1>
+
+    <p class="text-gray-600 mt-2">
+        Chapter: {{ chapter }}
+    </p>
+
+    <form method="POST" action="{{ url_for('student.submit_quiz') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        {% for q in questions %}
+        {% set question_number = loop.index %}
+        <div class="border rounded-xl p-5 mt-6">
+
+            <h2 class="font-bold text-lg">
+                Question {{ loop.index }}: {{ q.question }}
+            </h2>
+
+            <div class="mt-4 space-y-3">
+                {% for option in q.options %}
+                <label class="block border rounded-lg p-3 cursor-pointer hover:bg-sky-50">
+                    <input type="radio"
+                           name="q{{ question_number }}"
+                           value="{{ loop.index0 }}"
+                           required>
+                    {{ option }}
+                </label>
+                {% endfor %}
+            </div>
+
+        </div>
+        {% endfor %}
+
+        <button type="submit"
+                class="w-full mt-6 bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl">
+            Submit Quiz
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
