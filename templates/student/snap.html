@@ -1,0 +1,93 @@
+```html
+{% extends "base.html" %}
+
+{% block main_class %}max-w-3xl{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow-lg p-6 mt-6">
+
+<a href="{{ url_for('auth.student_home') }}"
+       class="text-sky-600 font-semibold">
+        ← Back to Dashboard
+    </a>
+
+    <h1 class="text-3xl font-bold text-sky-700 mt-4">
+        📸 Snap & Learn
+    </h1>
+
+    <p class="text-gray-600 mt-2">
+        Upload a picture of your textbook or study material
+        and let AI explain it in simple words.
+    </p>
+
+    <form method="POST"
+          enctype="multipart/form-data"
+          class="mt-6 space-y-4">
+
+        <input type="hidden"
+               name="csrf_token"
+               value="{{ csrf_token() }}">
+
+        <div>
+            <label class="block font-semibold mb-2">
+                Select an image
+            </label>
+
+            <input type="file"
+                   name="image"
+                   accept="image/jpeg,image/png,image/webp"
+                   required
+                   class="w-full border rounded-lg p-3">
+        </div>
+
+        <div>
+            <label class="block font-semibold mb-2">
+                Explanation language
+            </label>
+
+            <select name="language"
+                    class="w-full border rounded-lg p-3">
+                <option value="en">English</option>
+                <option value="hi">Hindi</option>
+                <option value="kn">Kannada</option>
+            </select>
+        </div>
+
+        <button type="submit"
+                class="bg-sky-600 hover:bg-sky-700 text-white px-6 py-3 rounded-lg font-semibold">
+            Explain Image
+        </button>
+    </form>
+
+    {% if result %}
+    <div class="mt-8 border-t pt-6">
+
+        <h2 class="text-2xl font-bold text-sky-700 mb-4">
+            AI Explanation
+        </h2>
+
+        <h3 class="font-bold text-lg">Summary</h3>
+        <ul class="list-disc pl-6 mt-2 space-y-2">
+            {% for point in result.summary %}
+            <li>{{ point }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3 class="font-bold text-lg mt-6">Important Definitions</h3>
+        <ul class="list-disc pl-6 mt-2 space-y-2">
+            {% for definition in result.definitions %}
+            <li>{{ definition }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3 class="font-bold text-lg mt-6">Simple Analogy</h3>
+        <p class="bg-sky-50 p-4 rounded-lg mt-2">
+            {{ result.analogy }}
+        </p>
+
+    </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+```

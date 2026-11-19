@@ -1,0 +1,73 @@
+
+{% extends "base.html" %}
+
+{% block main_class %}max-w-3xl{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-2xl shadow p-6 mt-6">
+
+  <a href="{{ url_for('auth.student_home') }}"
+     class="text-sky-600 font-semibold">
+    ← Back to Dashboard
+  </a>
+
+  <h1 class="text-3xl font-bold text-sky-700 mt-5">
+    📝 Let's Take a Quiz!
+  </h1>
+
+  <p class="text-gray-600 mt-2">
+    Choose your subject and chapter to begin learning.
+  </p>
+
+<form method="POST" action="{{ url_for('student.quiz') }}" class="mt-6 space-y-5">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div>
+      <label class="block font-semibold mb-2">Choose Subject</label>
+      <select name="subject"
+              class="w-full border rounded-lg p-3" required>
+        <option value="">Select Subject</option>
+        <option value="Science">Science</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="Social Science">Social Science</option>
+        <option value="English">English</option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-2">Choose Chapter</label>
+      <input type="text"
+             name="chapter"
+             placeholder="Enter chapter name"
+             class="w-full border rounded-lg p-3"
+             required>
+    </div>
+
+    <div>
+      <label class="block font-semibold mb-2">Quiz Language</label>
+      <select name="language"
+              class="w-full border rounded-lg p-3" required>
+        <option value="en">English</option>
+        <option value="kn">ಕನ್ನಡ</option>
+      </select>
+    </div>
+
+    <button type="submit"
+            class="w-full bg-sky-600 hover:bg-sky-700 text-white font-bold py-3 rounded-xl">
+      Start Quiz 🚀
+    </button>
+
+  </form>
+</div>
+
+<script src="{{ url_for('static', filename='js/speech.js') }}"></script>
+
+<div class="text-center mt-4">
+  <button
+    type="button"
+    onclick="speak('Welcome to your quiz! Choose your subject and chapter to begin.', 'en-IN')"
+    class="bg-purple-600 text-white px-5 py-3 rounded-xl">
+    🔊 Read Instructions
+  </button>
+</div>
+
+{% endblock %}
