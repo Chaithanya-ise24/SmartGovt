@@ -61,7 +61,8 @@
   <table class="w-full text-sm">
     <thead class="bg-sky-100 text-left">
       <tr><th class="p-2">Name</th><th class="p-2">Role</th><th class="p-2">Class</th>
-          <th class="p-2">Roll / Username</th><th class="p-2">Status</th><th class="p-2">Actions</th></tr>
+          <th class="p-2">Roll / Username</th><th class="p-2">PIN / Password</th>
+          <th class="p-2">Status</th><th class="p-2">Actions</th></tr>
     </thead>
     <tbody>
     {% for u in users %}
@@ -70,6 +71,19 @@
         <td class="p-2">{{ u.role }}</td>
         <td class="p-2">{{ u.class_name or '-' }}</td>
         <td class="p-2">{{ u.roll_no if u.role == 'student' else u.username }}</td>
+        <td class="p-2 whitespace-nowrap">
+          {% if u.role == 'student' and u.must_change_password %}
+            {% set real = default_pin %}
+          {% elif u.role == 'student' %}
+            {% set real = 'Set by user' %}
+          {% elif u.must_change_password %}
+            {% set real = 'Temporary (shown once)' %}
+          {% else %}
+            {% set real = 'Set by user' %}
+          {% endif %}
+          <span class="pin-text font-mono" data-real="{{ real }}">••••</span>
+          <button type="button" class="pin-toggle ml-1" title="Show or hide">👁</button>
+        </td>
         <td class="p-2">
           {% if not u.active %}<span class="text-red-600">Deactivated</span>
           {% elif u.is_locked() %}<span class="text-orange-600">Locked</span>
@@ -90,9 +104,21 @@
         </td>
       </tr>
     {% else %}
-      <tr><td colspan="6" class="p-4 text-center text-gray-500">No users found.</td></tr>
+      <tr><td colspan="7" class="p-4 text-center text-gray-500">No users found.</td></tr>
     {% endfor %}
     </tbody>
   </table>
 </div>
+
+<script>
+  // Per-row show/hide for the PIN / Password column
+  document.querySelectorAll('.pin-toggle').forEach(function (btn) {
+    var text = btn.parentNode.querySelector('.pin-text');
+    btn.addEventListener('click', function () {
+      var hidden = text.textContent === '••••';
+      text.textContent = hidden ? text.dataset.real : '••••';
+      btn.textContent = hidden ? '🙈' : '👁';
+    });
+  });
+</script>
 {% endblock %}

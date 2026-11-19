@@ -13,17 +13,19 @@
 <body class="bg-sky-50 min-h-screen">
   <nav class="bg-sky-600 text-white p-4 flex flex-wrap gap-3 justify-between items-center">
     <div class="flex flex-wrap gap-4 items-center">
-      <span class="font-bold text-lg">🏫 SmartGov School – GHPS Varthur</span>
+    <span class="font-bold text-lg">🏫 SmartGov School – GHPS Varthur</span>
       {% if g.user %}
-        {% block nav_links %}
+                {% block nav_links %}
           {% if g.user.role == 'student' %}
             <a class="underline" href="{{ url_for('auth.student_home') }}">Home</a>
-            {# Members add student links here, e.g. Library, Chat, Quiz, Progress #}
+            <a class="underline" href="{{ url_for('library.student_library') }}">Library</a>
           {% elif g.user.role == 'teacher' %}
             <a class="underline" href="{{ url_for('auth.teacher_home') }}">Home</a>
+            <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
           {% elif g.user.role == 'admin' %}
             <a class="underline" href="{{ url_for('auth.admin_home') }}">Home</a>
             <a class="underline" href="{{ url_for('admin.admin_users') }}">Users</a>
+            <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
           {% endif %}
         {% endblock %}
       {% endif %}
@@ -43,5 +45,30 @@
     {% endwith %}
     {% block content %}{% endblock %}
   </main>
+
+      <script>
+    // Puts an eye icon inside the right edge of every password box
+    document.querySelectorAll('input[type="password"]').forEach(function (input) {
+      var wrap = document.createElement('div');
+      wrap.className = 'relative w-full';
+      input.parentNode.insertBefore(wrap, input);
+      wrap.appendChild(input);
+      input.classList.add('pr-10');            // keeps typed text clear of the icon
+
+      var btn = document.createElement('button');
+      btn.type = 'button';                     // never submits the form
+      btn.textContent = '👁';
+      btn.title = 'Show or hide';
+      btn.setAttribute('aria-label', 'Show or hide password');
+      btn.className = 'absolute inset-y-0 right-0 px-3 flex items-center text-lg';
+      wrap.appendChild(btn);
+
+      btn.addEventListener('click', function () {
+        var isHidden = input.type === 'password';
+        input.type = isHidden ? 'text' : 'password';
+        btn.textContent = isHidden ? '🙈' : '👁';
+      });
+    });
+  </script>
 </body>
 </html>

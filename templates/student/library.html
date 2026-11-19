@@ -1,0 +1,67 @@
+{# SmartGov School Digital Library (Student) #}
+{% extends "base.html" %}
+{% block main_class %}max-w-4xl{% endblock %}
+
+{% block content %}
+<div class="bg-white p-6 rounded-xl shadow-sm border border-sky-100">
+  <div class="mb-5">
+    <h1 class="text-2xl font-bold text-sky-900">📚 Digital Library</h1>
+    <p class="text-sm text-gray-600 mt-1">Class {{ g.user.class_name }} study materials only.</p>
+  </div>
+
+  {# Subject & Category Filters #}
+  <form method="GET" action="{{ url_for('library.student_library') }}" class="flex flex-wrap gap-3 mb-5">
+    <select name="subject" class="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-sky-500">
+      <option value="">All Subjects</option>
+      {% for s in subjects %}
+        <option value="{{ s }}" {{ 'selected' if subject == s }}>{{ s }}</option>
+      {% endfor %}
+    </select>
+
+    <select name="category" class="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-sky-500">
+      <option value="">All Categories</option>
+      {% for c in categories %}
+        <option value="{{ c }}" {{ 'selected' if category == c }}>{{ c }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-lg text-sm font-medium">
+      🔍 Filter
+    </button>
+    {% if subject or category %}
+      <a href="{{ url_for('library.student_library') }}" class="px-3 py-2 text-sm text-gray-600 underline">Reset</a>
+    {% endif %}
+  </form>
+
+  <ul class="divide-y divide-sky-100 border border-sky-100 rounded-lg overflow-hidden">
+  {% for resource in files %}
+    <li class="p-4 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 hover:bg-sky-50/60 transition">
+      <div>
+        <div class="font-semibold text-gray-800">{{ resource.title }}</div>
+        <div class="flex flex-wrap gap-2 items-center mt-1 text-xs">
+          <span class="px-2 py-0.5 rounded-full font-medium bg-sky-100 text-sky-800">{{ resource.category }}</span>
+          {% if resource.subject %}
+            <span class="text-gray-500">· {{ resource.subject }}</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="flex gap-2 shrink-0">
+        <a href="{{ url_for('library.view_page', rid=resource.id) }}"
+           class="px-3 py-1.5 rounded-lg text-xs font-medium bg-sky-600 hover:bg-sky-700 text-white transition">
+          📖 View
+        </a>
+        <a href="{{ url_for('library.file_download', rid=resource.id) }}"
+           class="px-3 py-1.5 rounded-lg text-xs font-medium bg-emerald-600 hover:bg-emerald-700 text-white transition">
+          ⬇️ Download
+        </a>
+      </div>
+    </li>
+  {% else %}
+    <li class="p-6 text-center text-gray-500 text-sm">
+      No resources available for Class {{ g.user.class_name }} yet.
+    </li>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}
