@@ -13,12 +13,17 @@
 <body class="bg-sky-50 min-h-screen">
   <nav class="bg-sky-600 text-white p-4 flex flex-wrap gap-3 justify-between items-center">
     <div class="flex flex-wrap gap-4 items-center">
-    <span class="font-bold text-lg">🏫 SmartGov School – GHPS Varthur</span>
+      <span class="font-bold text-lg">🏫 SmartGov School – GHPS Varthur</span>
       {% if g.user %}
-                {% block nav_links %}
+        {% block nav_links %}
           {% if g.user.role == 'student' %}
             <a class="underline" href="{{ url_for('auth.student_home') }}">Home</a>
             <a class="underline" href="{{ url_for('library.student_library') }}">Library</a>
+            <a class="underline" href="{{ url_for('ai.doubt') }}">Ask a Doubt</a>
+            <a class="underline" href="{{ url_for('ai.snap') }}">Snap &amp; Learn</a>
+            <a class="underline" href="{{ url_for('student.quiz') }}">Quiz</a>
+            <a class="underline" href="{{ url_for('student.flashcards') }}">Flashcards</a>
+            <a class="underline" href="{{ url_for('student.progress') }}">My Progress</a>
           {% elif g.user.role == 'teacher' %}
             <a class="underline" href="{{ url_for('auth.teacher_home') }}">Home</a>
             <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
@@ -46,7 +51,7 @@
     {% block content %}{% endblock %}
   </main>
 
-      <script>
+  <script>
     // Puts an eye icon inside the right edge of every password box
     document.querySelectorAll('input[type="password"]').forEach(function (input) {
       var wrap = document.createElement('div');
