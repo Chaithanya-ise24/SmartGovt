@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block main_class %}max-w-5xl{% endblock %}
+{% block content %}
+<div class="flex justify-between items-center mt-4 mb-4">
+  <h1 class="text-xl font-bold">👤 User Management</h1>
+  <a href="{{ url_for('admin_home') }}" class="underline text-sky-700">← Dashboard</a>
+</div>
+
+<div class="grid md:grid-cols-3 gap-4 mb-6">
+  <!-- Add student -->
+  <form method="post" action="{{ url_for('admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <h2 class="font-bold">Add Student</h2>
+    <input type="hidden" name="role" value="student">
+    <input name="name" placeholder="Student name" class="w-full border rounded p-2" required>
+    <select name="grade" class="w-full border rounded p-2" required>
+      <option value="">Class</option><option>5</option><option>6</option><option>7</option>
+    </select>
+    <input name="roll" type="number" min="1" placeholder="Roll number" class="w-full border rounded p-2" required>
+    <button class="w-full bg-sky-600 text-white py-2 rounded">Create (PIN {{ default_pin }})</button>
+  </form>
+
+  <!-- Add teacher -->
+  <form method="post" action="{{ url_for('admin_add_user') }}" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <h2 class="font-bold">Add Teacher</h2>
+    <input type="hidden" name="role" value="teacher">
+    <input name="name" placeholder="Teacher name" class="w-full border rounded p-2" required>
+    <input name="username" placeholder="Username" class="w-full border rounded p-2" required>
+    <input name="password" type="password" placeholder="Temporary password (8+ chars)" class="w-full border rounded p-2" required>
+    <button class="w-full bg-sky-600 text-white py-2 rounded">Create Teacher</button>
+  </form>
+
+  <!-- CSV import -->
+  <form method="post" action="{{ url_for('admin_import_csv') }}" enctype="multipart/form-data" class="bg-white rounded-xl shadow p-4 space-y-2">
+    <h2 class="font-bold">Import Class (CSV)</h2>
+    <p class="text-sm text-gray-600">Columns: <code>name,class,roll</code></p>
+    <input type="file" name="csv_file" accept=".csv" class="w-full text-sm" required>
+    <button class="w-full bg-sky-600 text-white py-2 rounded">Upload &amp; Create</button>
+  </form>
+</div>
+
+<!-- Filters -->
+<form method="get" class="flex flex-wrap gap-2 mb-3">
+  <select name="role" class="border rounded p-2 bg-white">
+    <option value="">All roles</option>
+    <option value="student" {{ 'selected' if role=='student' }}>Students</option>
+    <option value="teacher" {{ 'selected' if role=='teacher' }}>Teachers</option>
+  </select>
+  <select name="grade" class="border rounded p-2 bg-white">
+    <option value="">All classes</option>
+    {% for c in ['5','6','7'] %}<option {{ 'selected' if grade==c }}>{{ c }}</option>{% endfor %}
+  </select>
+  <input name="q" value="{{ q }}" placeholder="Search name" class="border rounded p-2 bg-white">
+  <button class="bg-gray-700 text-white px-4 rounded">Filter</button>
+</form>
+
+<!-- User table -->
+<div class="bg-white rounded-xl shadow overflow-x-auto">
+  <table class="w-full text-sm">
+    <thead class="bg-sky-100 text-left">
+      <tr><th class="p-2">Name</th><th class="p-2">Role</th><th class="p-2">Class</th>
+          <th class="p-2">Roll / Username</th><th class="p-2">Status</th><th class="p-2">Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for u in users %}
+      <tr class="border-t">
+        <td class="p-2">{{ u.name }}</td>
+        <td class="p-2">{{ u.role }}</td>
+        <td class="p-2">{{ u.class_name or '-' }}</td>
+        <td class="p-2">{{ u.roll_no if u.role == 'student' else u.username }}</td>
+        <td class="p-2">
+          {% if not u.active %}<span class="text-red-600">Deactivated</span>
+          {% elif u.is_locked() %}<span class="text-orange-600">Locked</span>
+          {% else %}<span class="text-green-700">Active</span>{% endif %}
+        </td>
+        <td class="p-2 flex gap-1 flex-wrap">
+          <form method="post" action="{{ url_for('admin_reset_pin', uid=u.id) }}"
+                onsubmit="return confirm('Reset login for {{ u.name|e }}?')">
+            <button class="px-2 py-1 bg-yellow-400 rounded">Reset</button></form>
+          <form method="post" action="{{ url_for('admin_toggle_user', uid=u.id) }}">
+            <button class="px-2 py-1 bg-gray-300 rounded">{{ 'Deactivate' if u.active else 'Activate' }}</button></form>
+          <form method="post" action="{{ url_for('admin_delete_user', uid=u.id) }}"
+                onsubmit="return confirm('Permanently delete {{ u.name|e }} and all their scores?')">
+            <button class="px-2 py-1 bg-red-500 text-white rounded">Delete</button></form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="p-4 text-center text-gray-500">No users found.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

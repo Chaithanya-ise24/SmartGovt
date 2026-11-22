@@ -1,0 +1,7 @@
+.env
+venv/
+__pycache__/
+school.db
+school.db-shm
+school.db-wal
+*.pyc

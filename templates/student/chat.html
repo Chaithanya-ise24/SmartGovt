@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% block main_class %}max-w-3xl{% endblock %}
+{% block content %}
+<section class="bg-white rounded-xl shadow p-5 mt-5">
+  <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+    <div>
+      <h1 class="text-2xl font-bold text-sky-900">Ask a question</h1>
+      <p class="text-gray-600">Ask in English or Kannada. Your recent chat helps with follow-up questions.</p>
+    </div>
+    <a href="{{ url_for('student_home') }}" class="text-sky-700 underline">Back to dashboard</a>
+  </div>
+
+  <div class="grid sm:grid-cols-2 gap-3 mb-4">
+    <label class="text-sm font-semibold">Subject
+      <select id="subject" class="block w-full border rounded p-2 mt-1">
+        <option value="">Choose a subject</option>
+        <option>Science</option>
+        <option>Social Studies</option>
+        <option>Mathematics</option>
+        <option>English</option>
+      </select>
+    </label>
+    <label class="text-sm font-semibold">Topic (optional)
+      <input id="topic" maxlength="200" class="block w-full border rounded p-2 mt-1"
+             placeholder="For example, plants">
+    </label>
+  </div>
+
+  <div id="messages" class="h-80 overflow-y-auto border rounded-lg bg-slate-50 p-3 space-y-3"
+       aria-live="polite" aria-label="Conversation"></div>
+  <p id="status" class="text-sm text-gray-600 mt-2" role="status"></p>
+
+  <form id="chat-form" class="flex gap-2 mt-3">
+    <label for="question" class="sr-only">Your question</label>
+    <textarea id="question" rows="2" maxlength="2000" required
+              class="flex-1 border rounded p-2" placeholder="Type your question..."></textarea>
+    <button id="send" class="self-end bg-sky-600 text-white px-5 py-2 rounded">Send</button>
+  </form>
+
+  <div class="flex flex-wrap gap-2 mt-3">
+    <button type="button" id="kannada" class="border border-sky-600 text-sky-800 px-3 py-2 rounded">
+      In Kannada
+    </button>
+    <button type="button" id="example" class="border border-sky-600 text-sky-800 px-3 py-2 rounded">
+      Another example
+    </button>
+    <button type="button" id="got-it" class="border border-green-600 text-green-800 px-3 py-2 rounded">
+      I got it! 🎉
+    </button>
+  </div>
+</section>
+
+<script>
+  const form = document.getElementById('chat-form');
+  const questionInput = document.getElementById('question');
+  const messages = document.getElementById('messages');
+  const statusText = document.getElementById('status');
+  const sendButton = document.getElementById('send');
+  const history = [];
+  let isSending = false;
+
+  function addMessage(role, text) {
+    const bubble = document.createElement('p');
+    bubble.className = role === 'user'
+      ? 'ml-auto max-w-[85%] rounded-lg bg-sky-100 p-3 text-slate-900'
+      : 'mr-auto max-w-[85%] rounded-lg bg-white border p-3 text-slate-900';
+    bubble.textContent = text;
+    messages.appendChild(bubble);
+    messages.scrollTop = messages.scrollHeight;
+  }
+
+  async function ask(question, language = 'en') {
+    const cleanQuestion = question.trim();
+    if (!cleanQuestion || isSending) return;
+    isSending = true;
+    addMessage('user', cleanQuestion);
+    questionInput.value = '';
+    sendButton.disabled = true;
+    statusText.textContent = 'Thinking...';
+    let failureMessage = 'Sorry, I could not reach the chat. Please check your connection and try again.';
+    try {
+      const response = await fetch('{{ url_for("student_chat_api") }}', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          question: cleanQuestion,
+          history: history.slice(-10),
+          language,
+          subject: document.getElementById('subject').value,
+          topic: document.getElementById('topic').value
+        })
+      });
+      let result = {};
+      try {
+        result = await response.json();
+      } catch (_) {
+        result = {};
+      }
+      if (!response.ok) {
+        failureMessage = result.error || 'The chat is unavailable right now. Please try again.';
+        throw new Error();
+      }
+      if (typeof result.answer !== 'string' || !result.answer.trim()) throw new Error();
+      addMessage('assistant', result.answer);
+      history.push({question: cleanQuestion, answer: result.answer});
+      history.splice(0, Math.max(0, history.length - 10));
+      statusText.textContent = '';
+    } catch (_) {
+      addMessage('assistant', failureMessage);
+      statusText.textContent = '';
+    } finally {
+      isSending = false;
+      sendButton.disabled = false;
+      questionInput.focus();
+    }
+  }
+
+  form.addEventListener('submit', event => {
+    event.preventDefault();
+    ask(questionInput.value);
+  });
+  document.getElementById('kannada').addEventListener('click', () => {
+    if (!history.length) {
+      const question = questionInput.value.trim();
+      if (question) ask(question, 'kn');
+      else statusText.textContent = 'Ask a question first.';
+      return;
+    }
+    ask('Please explain the same doubt in Kannada.', 'kn');
+  });
+  document.getElementById('example').addEventListener('click', () => {
+    if (!history.length) {
+      statusText.textContent = 'Ask a question first.';
+      return;
+    }
+    ask('Please give another simple example.', 'en');
+  });
+  document.getElementById('got-it').addEventListener('click', () => {
+    if (isSending) return;
+    const question = 'I got it!';
+    const answer = 'Great job! Keep learning. 🎉';
+    addMessage('user', question);
+    addMessage('assistant', answer);
+    history.push({question, answer});
+    history.splice(0, Math.max(0, history.length - 10));
+  });
+</script>
+{% endblock %}
