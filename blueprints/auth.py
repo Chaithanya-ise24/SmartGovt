@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-
+from services.stats import compute_streak
 from flask import (Blueprint, render_template, request, redirect,
                    url_for, session, flash, g, current_app)
 
@@ -103,8 +103,8 @@ def home():
 @bp.route("/student")
 @role_required("student")
 def student_home():
-    return render_template("dashboard.html", title="Student Dashboard")
-
+    return render_template("dashboard.html", title="Student Dashboard",
+                           streak=compute_streak(g.user.id))
 
 @bp.route("/teacher")
 @teacher_required
