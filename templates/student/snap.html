@@ -47,9 +47,8 @@
 
             <select name="language"
                     class="w-full border rounded-lg p-3">
-                <option value="en">English</option>
-                <option value="hi">Hindi</option>
-                <option value="kn">Kannada</option>
+                <option value="en" {% if selected_language == "en" %}selected{% endif %}>English</option>
+                <option value="kn" {% if selected_language == "kn" %}selected{% endif %}>ಕನ್ನಡ (Kannada)</option>
             </select>
         </div>
 

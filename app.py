@@ -1,6 +1,11 @@
+import os
+
 from flask import Flask, render_template, request
 from flask_wtf.csrf import CSRFError
 from sqlalchemy import event
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(os.path.abspath(__file__)), ".env"))
 
 from config import Config
 from extensions import csrf
@@ -11,6 +16,15 @@ from auth_utils import load_user
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    print(
+        "Gemini API key configured: "
+        + ("yes" if bool((app.config.get("GEMINI_API_KEY") or "").strip()) else "no"),
+        flush=True
+    )
+    print(
+        "Gemini model configured: " + str(app.config.get("GEMINI_MODEL") or "<unset>"),
+        flush=True
+    )
 
     db.init_app(app)
     csrf.init_app(app)
