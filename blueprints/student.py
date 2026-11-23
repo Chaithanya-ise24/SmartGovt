@@ -3,11 +3,12 @@ from datetime import date, timedelta
 
 from flask import (
     Blueprint, render_template, request, redirect,
-    url_for, flash, g, session
+    url_for, flash, g, session, current_app
 )
 from models import db, QuizResult, User
 from auth_utils import role_required
-from services.ai_service import generate_quiz
+from services.ai_service import AIError, generate_quiz
+from blueprints.ai import _rate_limited
 bp = Blueprint("student", __name__)
 @bp.route("/student/quiz", methods=["GET", "POST"])
 @role_required("student")
@@ -20,13 +21,30 @@ def quiz():
         if not subject or not chapter:
             flash("Please select a subject and enter a chapter.", "error")
             return redirect(url_for("student.quiz"))
+        if _rate_limited(g.user.id):
+            flash("Too many AI requests. Please try again later.", "error")
+            return redirect(url_for("student.quiz"))
 
-        questions = generate_quiz(
-            g.user.class_name,
-            subject,
-            chapter,
-            language
-        )
+        try:
+            questions = generate_quiz(
+                g.user.class_name,
+                subject,
+                chapter,
+                language
+            )
+        except AIError as exc:
+            current_app.logger.warning("AI quiz generation rejected: %s", exc)
+            flash(
+                "The external AI service is unavailable, so the quiz could not be generated. "
+                "Please try again later.",
+                "error"
+            )
+            return redirect(url_for("student.quiz"))
+        except Exception:
+            db.session.rollback()
+            current_app.logger.exception("AI quiz generation error")
+            flash("The quiz could not be generated. Please try again.", "error")
+            return redirect(url_for("student.quiz"))
 
         session["active_quiz"] = {
             "subject": subject,

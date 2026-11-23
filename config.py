@@ -1,8 +1,8 @@
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
 basedir = os.path.abspath(os.path.dirname(__file__))
+load_dotenv(dotenv_path=os.path.join(basedir, ".env"))
 
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY", "change-me")
@@ -15,7 +15,11 @@ class Config:
     SESSION_COOKIE_SAMESITE = "Lax"
 
     GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
+    GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.8-flash")
+    GEMINI_FALLBACK_MODEL = os.getenv("GEMINI_FALLBACK_MODEL", "gemini-3.7-flash")
+    AI_DEMO_MODE = os.getenv("AI_DEMO_MODE", "true").strip().casefold() in {
+        "1", "true", "yes", "on"
+    }
 
     ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "headmaster")
     ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "ChangeMe123!")

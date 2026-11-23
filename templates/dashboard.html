@@ -1,34 +1,54 @@
 {% extends "base.html" %}
-
-{% block main_class %}
-  {% if g.user and g.user.role == 'student' %}
-    max-w-6xl
-  {% else %}
-    max-w-md
-  {% endif %}
-{% endblock %}
+{% block main_class %}{{ 'max-w-4xl' if g.user and g.user.role == 'student' else 'max-w-2xl' }}{% endblock %}
 
 {% block content %}
+  {% if g.user and g.user.role == 'student' %}
+    {% include "student/home_content.html" %}
 
-{% if g.user and g.user.role == 'student' %}
+  {% elif g.user and g.user.role == 'teacher' %}
+    <div class="bg-white rounded-2xl shadow p-6 mt-6 space-y-5">
+      <div>
+        <h1 class="text-2xl font-bold text-sky-700">👩‍🏫 Teacher Dashboard</h1>
+        <p class="text-gray-600 mt-1">Welcome, {{ g.user.name }}. Upload textbooks, notes and worksheets for Classes 5–7.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="{{ url_for('library.documents') }}" class="bg-sky-50 border border-sky-200 p-5 rounded-xl hover:shadow-md block">
+          <div class="text-3xl">📂</div>
+          <h2 class="font-bold text-lg text-sky-800 mt-2">Manage Documents</h2>
+          <p class="text-sm text-gray-600 mt-1">Upload new PDFs or remove old files.</p>
+        </a>
+        <a href="{{ url_for('auth.change_password') }}" class="bg-amber-50 border border-amber-200 p-5 rounded-xl hover:shadow-md block">
+          <div class="text-3xl">🔑</div>
+          <h2 class="font-bold text-lg text-amber-800 mt-2">Change Password</h2>
+          <p class="text-sm text-gray-600 mt-1">Update your login password.</p>
+        </a>
+      </div>
+    </div>
 
-  {% include "student/home_content.html" %}
+  {% elif g.user and g.user.role == 'admin' %}
+    <div class="bg-white rounded-2xl shadow p-6 mt-6 space-y-5">
+      <div>
+        <h1 class="text-2xl font-bold text-sky-700">🏫 Headmaster Dashboard</h1>
+        <p class="text-gray-600 mt-1">Welcome, {{ g.user.name }}. Manage accounts, CSV imports and library content.</p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="{{ url_for('admin.admin_users') }}" class="bg-sky-50 border border-sky-200 p-5 rounded-xl hover:shadow-md block">
+          <div class="text-3xl">👥</div>
+          <h2 class="font-bold text-lg text-sky-800 mt-2">Manage Users</h2>
+          <p class="text-sm text-gray-600 mt-1">Add students and teachers, CSV import, PIN resets.</p>
+        </a>
+        <a href="{{ url_for('library.documents') }}" class="bg-emerald-50 border border-emerald-200 p-5 rounded-xl hover:shadow-md block">
+          <div class="text-3xl">📚</div>
+          <h2 class="font-bold text-lg text-emerald-800 mt-2">Digital Library</h2>
+          <p class="text-sm text-gray-600 mt-1">Upload or remove PDFs for all classes.</p>
+        </a>
+      </div>
+    </div>
 
-{% else %}
-
-  <div class="bg-white rounded-xl shadow p-6 mt-6">
-    <h1 class="text-xl font-bold">{{ title }}</h1>
-
-    {% if g.user and g.user.role == 'admin' %}
-      <a href="{{ url_for('admin.admin_users') }}"
-         class="inline-block mt-4 bg-sky-600 text-white px-4 py-2 rounded">
-        👤 Manage Users
-      </a>
-    {% else %}
-      <p class="text-gray-600 mt-2">Features coming soon.</p>
-    {% endif %}
-  </div>
-
-{% endif %}
-
+  {% else %}
+    <div class="bg-white rounded-xl shadow p-6 mt-6">
+      <h1 class="text-xl font-bold text-red-600">{{ title or "Access Denied" }}</h1>
+      <p class="text-gray-600 mt-2">You do not have permission to view this page.</p>
+    </div>
+  {% endif %}
 {% endblock %}
