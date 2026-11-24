@@ -2,9 +2,44 @@ from flask import Blueprint, render_template
 from sqlalchemy import func
 
 from models import db, User, QuizResult, DoubtLog, Resource
-from auth_utils import teacher_required
+from auth_utils import teacher_required, login_required
 
 bp = Blueprint("dashboards", __name__)
+
+COMING_SOON = [
+    {"icon": "🌐", "title": "Kannada / English interface",
+     "desc": "Switch every menu and button between Kannada and English.",
+     "roles": ["student", "teacher", "admin"]},
+    {"icon": "📖", "title": "Answers from your textbook",
+     "desc": "The AI will answer using the exact KTBS chapter you uploaded.",
+     "roles": ["student", "teacher", "admin"]},
+    {"icon": "🏆", "title": "Class Leaderboard",
+     "desc": "See the top learners in your class by stars and streaks.",
+     "roles": ["student", "teacher", "admin"]},
+    {"icon": "📝", "title": "Revision summaries",
+     "desc": "One-tap short summary of any chapter, in Kannada or English.",
+     "roles": ["student", "teacher"]},
+    {"icon": "📄", "title": "Worksheet maker",
+     "desc": "Generate a practice worksheet with an answer key in seconds.",
+     "roles": ["teacher", "admin"]},
+    {"icon": "👀", "title": "Student View preview",
+     "desc": "See the app exactly as your students see it.",
+     "roles": ["teacher", "admin"]},
+    {"icon": "🛡️", "title": "Content oversight and school overview",
+     "desc": "Headmaster charts for the whole school and review of all uploads.",
+     "roles": ["admin"]},
+    {"icon": "🚀", "title": "Live online deployment",
+     "desc": "The portal will go live so students can use it from home.",
+     "roles": ["admin"]},
+]
+
+
+@bp.route("/coming-soon")
+@login_required
+def coming_soon():
+    from flask import g
+    items = [i for i in COMING_SOON if g.user.role in i["roles"]]
+    return render_template("coming_soon.html", items=items)
 
 
 @bp.route("/teacher/analytics")

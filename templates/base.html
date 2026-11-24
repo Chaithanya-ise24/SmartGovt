@@ -33,11 +33,12 @@
             <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
             <a class="underline" href="{{ url_for('dashboards.analytics') }}">Analytics</a>
           {% endif %}
+          <a class="underline" href="{{ url_for('dashboards.coming_soon') }}">🚧 Coming soon</a>
         {% endblock %}
       {% endif %}
     </div>
     <div class="flex gap-3 items-center">
-      <button id="lang-toggle" class="bg-white/20 px-2 py-1 rounded text-sm hidden">ಕನ್ನಡ / EN</button>
+      <button disabled title="Coming soon" class="bg-white/10 text-white/60 px-2 py-1 rounded text-sm cursor-not-allowed">ಕನ್ನಡ / EN</button>
       {% if g.user %}
         <span>{{ g.user.name }} ({{ g.user.role }}) · <a class="underline" href="{{ url_for('auth.logout') }}">Logout</a></span>
       {% endif %}

@@ -1,0 +1,11 @@
+﻿<div class="mt-8 bg-white rounded-2xl shadow p-5">
+  <div class="flex items-center justify-between mb-3">
+    <h2 class="font-bold text-gray-800">🚧 Coming soon</h2>
+    <a href="{{ url_for('dashboards.coming_soon') }}" class="text-sm text-sky-600 underline">See all</a>
+  </div>
+  <div class="flex flex-wrap gap-2">
+    {% for t in ['🌐 Kannada / English interface', '📖 Textbook answers', '🏆 Leaderboard'] %}
+    <span class="text-sm bg-purple-50 text-purple-800 border border-purple-200 px-3 py-1 rounded-full">{{ t }}</span>
+    {% endfor %}
+  </div>
+</div>
