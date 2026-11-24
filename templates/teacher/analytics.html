@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block main_class %}max-w-5xl{% endblock %}
+{% block content %}
+<div class="mt-4 space-y-6">
+  <h1 class="text-2xl font-bold text-sky-800">📊 Class Analytics</h1>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    {% for c in classes %}
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="font-bold text-lg text-sky-700">Class {{ c.name }}</h2>
+      <p class="text-sm text-gray-600 mt-2">👩‍🎓 Students: <b>{{ c.students }}</b></p>
+      <p class="text-sm text-gray-600">📝 Quizzes taken: <b>{{ c.quizzes }}</b></p>
+      <p class="text-sm text-gray-600">📈 Average score: <b>{{ c.avg }}%</b></p>
+      <p class="text-sm text-gray-600">💡 Doubts asked: <b>{{ c.doubts }}</b></p>
+      <p class="text-sm text-gray-600">📚 Documents: <b>{{ c.docs }}</b></p>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-4">
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="font-bold text-sky-700 mb-3">Subject performance</h2>
+      {% for s in subjects %}
+      <div class="mb-2">
+        <div class="flex justify-between text-sm"><span>{{ s.name }}</span><span>{{ s.avg }}%</span></div>
+        <progress class="w-full h-2 rounded overflow-hidden" value="{{ s.avg }}" max="100" aria-label="{{ s.name }} average score">{{ s.avg }}%</progress>
+      </div>
+      {% else %}<p class="text-sm text-gray-500">No quizzes taken yet.</p>{% endfor %}
+    </div>
+
+    <div class="bg-white rounded-xl shadow p-5">
+      <h2 class="font-bold text-sky-700 mb-3">⭐ Top students</h2>
+      {% for u in top %}
+      <p class="text-sm py-1 border-b">{{ loop.index }}. {{ u.name }} (Class {{ u.class_name }}) — <b>{{ u.total_stars or 0 }}</b> stars</p>
+      {% else %}<p class="text-sm text-gray-500">No students yet.</p>{% endfor %}
+    </div>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-5">
+    <h2 class="font-bold text-sky-700 mb-3">Recent doubts</h2>
+    {% for d, u in recent %}
+    <p class="text-sm py-1 border-b"><b>{{ u.name }}</b> (Class {{ u.class_name }}, {{ d.subject or 'General' }}): {{ d.question }}</p>
+    {% else %}<p class="text-sm text-gray-500">No doubts asked yet.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

@@ -19,14 +19,19 @@
           {% if g.user.role == 'student' %}
             <a class="underline" href="{{ url_for('auth.student_home') }}">Home</a>
             <a class="underline" href="{{ url_for('library.library') }}">Library</a>
-            {# Members add student links here, e.g. Chat, Quiz, Progress #}
+            <a class="underline" href="{{ url_for('ai.doubt') }}">Doubt</a>
+            <a class="underline" href="{{ url_for('ai.snap') }}">Snap</a>
+            <a class="underline" href="{{ url_for('student.quiz') }}">Quiz</a>
+            <a class="underline" href="{{ url_for('student.progress') }}">Progress</a>
           {% elif g.user.role == 'teacher' %}
             <a class="underline" href="{{ url_for('auth.teacher_home') }}">Home</a>
             <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
+            <a class="underline" href="{{ url_for('dashboards.analytics') }}">Analytics</a>
           {% elif g.user.role == 'admin' %}
             <a class="underline" href="{{ url_for('auth.admin_home') }}">Home</a>
             <a class="underline" href="{{ url_for('admin.admin_users') }}">Users</a>
             <a class="underline" href="{{ url_for('library.documents') }}">Documents</a>
+            <a class="underline" href="{{ url_for('dashboards.analytics') }}">Analytics</a>
           {% endif %}
         {% endblock %}
       {% endif %}

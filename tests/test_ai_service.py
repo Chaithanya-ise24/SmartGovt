@@ -54,9 +54,11 @@ class GeminiRequestRetryTests(unittest.TestCase):
         sleep.assert_called_once_with(4)
 
     def test_retries_are_limited(self):
+        app = Flask(__name__)
+        app.config["GEMINI_FALLBACK_MODEL"] = ""
         error = self._provider_error(504)
         request = Mock(side_effect=[error, error, error])
-        with patch.object(ai_service.time, "sleep") as sleep:
+        with app.app_context(), patch.object(ai_service.time, "sleep") as sleep:
             with self.assertRaises(ai_service.AIError):
                 ai_service._run_gemini_request("test", "test-model", request)
 
@@ -120,14 +122,17 @@ class GeminiRequestRetryTests(unittest.TestCase):
 
                     self.assertTrue(demo_mode)
                     self.assertIn("DEMO MODE", answer)
-                    self.assertIn("ಲೈವ್ AI ರಚಿಸಿದುದಲ್ಲ" if language == "kn" else "not live AI-generated", answer)
+                    self.assertIn(
+                        "ಲೈವ್ AI ರಚಿಸಿದುದಲ್ಲ" if language == "kn" else "not live AI-generated",
+                        answer
+                    )
             live_reply.assert_not_called()
 
     def test_demo_answers_match_supported_topics_in_english_and_kannada(self):
         english_questions = (
             ("What is Java?", "Java is"),
             ("What is Python?", "Python is"),
-            ("What is evaporation?", "Evaporation is"),
+            ("What is evaporation?", "Evaporation happens"),
             ("What is photosynthesis?", "Photosynthesis is"),
             ("What is a database?", "A database is"),
         )
@@ -139,11 +144,11 @@ class GeminiRequestRetryTests(unittest.TestCase):
                 self.assertIn(expected, answer)
 
         kannada_questions = (
-            ("ಜಾವಾ ಎಂದರೇನು?", "Java ಒಂದು"),
+            ("ಜಾವಾ ಎಂದರೇನು?", "Java ಎಂಬುದು"),
             ("ಪೈಥಾನ್ ಎಂದರೇನು?", "Python"),
-            ("ಆವಿಯಾಗುವಿಕೆ ಎಂದರೇನು?", "ಆವೀಕರಣದಲ್ಲಿ"),
+            ("ಆವಿಯಾಗುವಿಕೆ ಎಂದರೇನು?", "ಆವೀಕರಣ"),
             ("ಪ್ರಕಾಶಸಂಶ್ಲೇಷಣೆ ಎಂದರೇನು?", "ಹಸಿರು ಸಸ್ಯಗಳು"),
-            ("ದತ್ತಸಂಚಯ ಎಂದರೇನು?", "ದತ್ತಸಂಚಯವು"),
+            ("ದತ್ತಸಂಚಯ ಎಂದರೇನು?", "ಡೇಟಾಬೇಸ್"),
         )
         for question, expected in kannada_questions:
             with self.subTest(question=question):
@@ -277,3 +282,7 @@ class GeminiRequestRetryTests(unittest.TestCase):
 
         options = create_client.call_args.kwargs["http_options"]
         self.assertEqual(options.timeout, ai_service.REQUEST_TIMEOUT_SECONDS * 1000)
+
+
+if __name__ == "__main__":
+    unittest.main()

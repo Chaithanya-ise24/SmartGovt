@@ -36,6 +36,12 @@ def _visible(resource):
     return g.user.role != "student" or resource.class_name == g.user.class_name
 
 
+def _resource_disk_path(resource):
+    """Resolve the absolute path of an uploaded resource on disk."""
+    upload_dir = os.path.abspath(current_app.config["UPLOAD_FOLDER"])
+    return os.path.join(upload_dir, resource.file_path)
+
+
 def _load(resource_id):
     resource = db.get_or_404(Resource, resource_id)
     if not _visible(resource):
@@ -60,7 +66,10 @@ def library():
 @login_required
 def view_resource(resource_id):
     resource = _load(resource_id)
-    return render_template("library_view.html", resource=resource)
+    file_missing = not os.path.isfile(_resource_disk_path(resource))
+    if file_missing:
+        flash("This PDF file is missing on the server. Please ask a teacher to re-upload it.", "error")
+    return render_template("library_view.html", resource=resource, file_missing=file_missing)
 
 
 @bp.route("/library/file/<int:resource_id>")
@@ -68,7 +77,7 @@ def view_resource(resource_id):
 def file_resource(resource_id):
     """Streams the PDF for the viewer iframe (inline, not a download)."""
     resource = _load(resource_id)
-    path = os.path.join(current_app.config["UPLOAD_FOLDER"], resource.file_path)
+    path = _resource_disk_path(resource)
     if not os.path.isfile(path):
         abort(404)
     resp = send_file(path, mimetype="application/pdf", as_attachment=False)
@@ -80,9 +89,10 @@ def file_resource(resource_id):
 @login_required
 def download_resource(resource_id):
     resource = _load(resource_id)
-    path = os.path.join(current_app.config["UPLOAD_FOLDER"], resource.file_path)
+    path = _resource_disk_path(resource)
     if not os.path.isfile(path):
-        abort(404)
+        flash("PDF file not found on the server.", "error")
+        return redirect(url_for("library.view_resource", resource_id=resource_id))
     name = secure_filename(resource.title) or "document"
     return send_file(path, mimetype="application/pdf", as_attachment=True,
                      download_name=f"{name}.pdf")
@@ -115,8 +125,8 @@ def upload_resource():
     elif not _is_real_pdf(file):
         flash("Please upload a real PDF file.", "error")
     else:
-        filename = secrets.token_hex(16) + ".pdf"      # random, unguessable
-        upload_dir = current_app.config["UPLOAD_FOLDER"]
+        filename = secrets.token_hex(16) + ".pdf"
+        upload_dir = os.path.abspath(current_app.config["UPLOAD_FOLDER"])
         os.makedirs(upload_dir, exist_ok=True)
         file.save(os.path.join(upload_dir, filename))
 
@@ -125,7 +135,8 @@ def upload_resource():
                                 subject=subject[:50] or None,
                                 file_path=filename, uploaded_by=g.user.id))
         db.session.commit()
-        flash(f"Uploaded “{title}”.", "success")
+        flash("Document uploaded successfully.", "success")
+
     return redirect(url_for("library.documents"))
 
 
@@ -134,14 +145,13 @@ def upload_resource():
 def delete_resource(resource_id):
     resource = db.get_or_404(Resource, resource_id)
     if g.user.role != "admin" and resource.uploaded_by != g.user.id:
-        abort(403)                      # teachers can only delete their own files
-    path = os.path.join(current_app.config["UPLOAD_FOLDER"], resource.file_path)
+        abort(403)
+
+    path = _resource_disk_path(resource)
     if os.path.isfile(path):
-        try:
-            os.remove(path)
-        except OSError:
-            pass
+        os.remove(path)
+
     db.session.delete(resource)
     db.session.commit()
     flash("Document deleted.", "success")
-    return redirect(request.referrer or url_for("library.documents"))
+    return redirect(url_for("library.documents"))

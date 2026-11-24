@@ -19,8 +19,8 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-REQUEST_TIMEOUT_SECONDS = 120
-IMAGE_REQUEST_TIMEOUT_SECONDS = 180
+REQUEST_TIMEOUT_SECONDS = 45
+IMAGE_REQUEST_TIMEOUT_SECONDS = 90
 MAX_RETRIES = 2
 RETRY_BACKOFF_SECONDS = 1
 RETRYABLE_STATUS_CODES = frozenset({429, 503, 504})
@@ -28,38 +28,38 @@ RETRYABLE_STATUS_CODES = frozenset({429, 503, 504})
 DEMO_TOPIC_RESPONSES = (
     (
         re.compile(r"\bjava\b|ಜಾವಾ"),
-        "Java is a high-level, class-based programming language used to build applications. "
-        "Its code runs on the Java Virtual Machine (JVM), which helps it work across systems.",
-        "Java ಒಂದು ಉನ್ನತ ಮಟ್ಟದ, ಕ್ಲಾಸ್ ಆಧಾರಿತ ಪ್ರೋಗ್ರಾಮಿಂಗ್ ಭಾಷೆ. ಇದರ ಕೋಡ್ Java Virtual "
-        "Machine (JVM) ಮೇಲೆ ಕಾರ್ಯನಿರ್ವಹಿಸುವುದರಿಂದ ವಿವಿಧ ವ್ಯವಸ್ಥೆಗಳಲ್ಲಿ ಬಳಸಬಹುದು.",
+        "Java is a computer language used to build apps and games. "
+        "It runs on a special tool called JVM so the same app works on different computers.",
+        "Java ಎಂಬುದು ಆ್ಯಪ್‌ಗಳು ಮತ್ತು ಗೇಮ್‌ಗಳನ್ನು ತಯಾರಿಸಲು ಬಳಸುವ ಕಂಪ್ಯೂಟರ್ ಭಾಷೆ. "
+        "ಇದು JVM ಎಂಬ ಸಾಧನದ ಮೇಲೆ ನಡೆಯುವುದರಿಂದ ಬೇರೆ ಬೇರೆ ಕಂಪ್ಯೂಟರ್‌ಗಳಲ್ಲಿ ಕೆಲಸ ಮಾಡುತ್ತದೆ.",
     ),
     (
         re.compile(r"\bpython\b|ಪೈಥಾನ್|ಪೈಥನ್"),
-        "Python is a programming language with readable syntax. It is used in education, "
-        "web development, automation, and data science.",
-        "Python ಸುಲಭವಾಗಿ ಓದಬಹುದಾದ ರಚನೆಯಿರುವ ಪ್ರೋಗ್ರಾಮಿಂಗ್ ಭಾಷೆ. ಇದನ್ನು ಶಿಕ್ಷಣ, ವೆಬ್ "
-        "ಅಭಿವೃದ್ಧಿ, ಸ್ವಯಂಚಾಲನೆ ಮತ್ತು ಡೇಟಾ ವಿಜ್ಞಾನದಲ್ಲಿ ಬಳಸುತ್ತಾರೆ.",
+        "Python is an easy-to-read computer language used to make websites, games, and smart tools. "
+        "Its commands look almost like simple English sentences.",
+        "Python ಓದಲು ಸುಲಭವಾದ ಕಂಪ್ಯೂಟರ್ ಭಾಷೆಯಾಗಿದ್ದು ವೆಬ್‌ಸೈಟ್ ಮತ್ತು ಗೇಮ್‌ಗಳನ್ನು ತಯಾರಿಸಲು ಬಳಸುತ್ತಾರೆ. "
+        "ಇದರ ಆಜ್ಞೆಗಳು ಸರಳ ಇಂಗ್ಲಿಷ್ ವಾಕ್ಯಗಳಂತೆಯೇ ಇರುತ್ತವೆ.",
     ),
     (
         re.compile(r"\bevaporation\b|\bevaporate\b|ಆವಿಯಾಗುವಿಕೆ|ಆವೀಕರಣ"),
-        "Evaporation is the process in which liquid at a surface gains energy and becomes "
-        "gas. Water can evaporate below its boiling point.",
-        "ಆವೀಕರಣದಲ್ಲಿ ದ್ರವದ ಮೇಲ್ಮೈಯಲ್ಲಿರುವ ಕಣಗಳು ಶಕ್ತಿಯನ್ನು ಪಡೆದು ಅನಿಲವಾಗುತ್ತವೆ. ನೀರು "
-        "ಕುದಿಯುವ ಬಿಂದುವಿಗಿಂತ ಕಡಿಮೆ ತಾಪಮಾನದಲ್ಲಿಯೂ ಆವಿಯಾಗಬಹುದು.",
+        "Evaporation happens when liquid water warms up and turns into invisible gas in the air. "
+        "That is why wet clothes dry on a sunny afternoon.",
+        "ನೀರು ಬಿಸಿಯಾಗಿ ಗಾಳಿಯಲ್ಲಿ ಕಾಣದ ಆವಿಯಾಗಿ ಬದಲಾಗುವುದೇ ಆವೀಕರಣ. "
+        "ಬಿಸಿಲಿನಲ್ಲಿ ಒದ್ದೆ ಬಟ್ಟೆಗಳು ಒಣಗಲು ಇದೇ ಕಾರಣ.",
     ),
     (
         re.compile(r"\bphotosynthesis\b|ಪ್ರಕಾಶಸಂಶ್ಲೇಷಣೆ|ದ್ಯುತಿಸಂಶ್ಲೇಷಣೆ"),
-        "Photosynthesis is how green plants use sunlight, water, and carbon dioxide to "
-        "make sugar and release oxygen.",
-        "ಪ್ರಕಾಶಸಂಶ್ಲೇಷಣೆಯಲ್ಲಿ ಹಸಿರು ಸಸ್ಯಗಳು ಸೂರ್ಯನ ಬೆಳಕು, ನೀರು ಮತ್ತು ಕಾರ್ಬನ್ ಡೈಆಕ್ಸೈಡ್ "
-        "ಬಳಸಿ ಸಕ್ಕರೆಯನ್ನು ತಯಾರಿಸಿ ಆಮ್ಲಜನಕವನ್ನು ಬಿಡುಗಡೆ ಮಾಡುತ್ತವೆ.",
+        "Photosynthesis is how green plants make their own food using sunlight, water, and air. "
+        "While making food, plants also release fresh oxygen for us to breathe.",
+        "ಹಸಿರು ಸಸ್ಯಗಳು ಸೂರ್ಯನ ಬೆಳಕು, ನೀರು ಮತ್ತು ಗಾಳಿಯನ್ನು ಬಳಸಿ ತಮ್ಮ ಆಹಾರವನ್ನು ತಯಾರಿಸುವುದೇ ಪ್ರಕಾಶಸಂಶ್ಲೇಷಣೆ. "
+        "ಈ ಸಮಯದಲ್ಲಿ ಸಸ್ಯಗಳು ನಾವು ಉಸಿರಾಡಲು ಆಮ್ಲಜನಕವನ್ನು ನೀಡುತ್ತವೆ.",
     ),
     (
         re.compile(r"\bdatabases?\b|ಡೇಟಾಬೇಸ್|ದತ್ತಸಂಚಯ"),
-        "A database is an organized collection of information that can be stored, searched, "
-        "and updated. A school database might store student records.",
-        "ದತ್ತಸಂಚಯವು ಸಂಗ್ರಹಿಸಲು, ಹುಡುಕಲು ಮತ್ತು ನವೀಕರಿಸಲು ಸಾಧ್ಯವಾದ ಮಾಹಿತಿಯ ವ್ಯವಸ್ಥಿತ "
-        "ಸಂಗ್ರಹವಾಗಿದೆ. ಶಾಲೆಯ ದತ್ತಸಂಚಯದಲ್ಲಿ ವಿದ್ಯಾರ್ಥಿಗಳ ದಾಖಲೆಗಳಿರಬಹುದು.",
+        "A database is like a neat digital register that stores information so you can find it fast. "
+        "A school database keeps student names, roll numbers, and marks safe.",
+        "ಡೇಟಾಬೇಸ್ ಎಂದರೆ ಮಾಹಿತಿಯನ್ನು ಅಚ್ಚುಕಟ್ಟಾಗಿ ಸಂಗ್ರಹಿಸಿಡುವ ಡಿಜಿಟಲ್ ರಿಜಿಸ್ಟರ್ ಇದ್ದಂತೆ. "
+        "ಶಾಲೆಯ ಡೇಟಾಬೇಸ್‌ನಲ್ಲಿ ವಿದ್ಯಾರ್ಥಿಗಳ ಹೆಸರು ಮತ್ತು ಅಂಕಗಳನ್ನು ಸುರಕ್ಷಿತವಾಗಿ ಇಡಲಾಗುತ್ತದೆ.",
     ),
 )
 
@@ -77,6 +77,15 @@ DEMO_UNMATCHED_RESPONSE_KN = (
 
 class AIError(Exception):
     """Safe, user-facing-independent exception for AI service failures."""
+
+
+def _clean_plain_text(text):
+    """Strip Markdown symbols (**bold**, *italic*, # headings, bullet *) for plain-text chat UI."""
+    text = re.sub(r"\*\*(.*?)\*\*", r"\1", text)
+    text = re.sub(r"\*(.*?)\*", r"\1", text)
+    text = re.sub(r"(?m)^\s*#{1,6}\s*", "", text)
+    text = re.sub(r"(?m)^\s*\*\s+", "- ", text)
+    return text.strip()
 
 
 def _http_status(exc):
@@ -263,7 +272,7 @@ def _language_name(language):
 
 def _api_settings():
     api_key = None
-    model_name = "gemini-3.8-flash"
+    model_name = "gemini-2.5-flash"
     try:
         api_key = current_app.config.get("GEMINI_API_KEY")
         model_name = current_app.config.get("GEMINI_MODEL", model_name)
@@ -284,17 +293,13 @@ def _client(timeout=REQUEST_TIMEOUT_SECONDS):
     try:
         client = genai.Client(
             api_key=api_key,
-            http_options=types.HttpOptions(timeout=timeout * 1000)
+            http_options=types.HttpOptions(timeout=int(timeout * 1000)),
         )
         return client, model_name
     except Exception as exc:
-        _log_gemini_error(
-            "client_init",
-            model_name,
-            exc,
-            duration_ms=int((time.monotonic() - started_at) * 1000),
-            attempts=1
-        )
+        _log_gemini_error("client_init", model_name, exc,
+                          duration_ms=int((time.monotonic() - started_at) * 1000),
+                          attempts=1)
         raise AIError("Gemini is temporarily unavailable.") from exc
 
 
@@ -327,15 +332,13 @@ def _parse_json(text):
         raise AIError("Gemini returned malformed structured data.") from exc
 
 
-def _generate(client, model_name, prompt, operation):
+def _generate(client, model_name, prompt, operation, json_mode=False):
+    config = (types.GenerateContentConfig(response_mime_type="application/json")
+              if json_mode else None)
     response = _run_gemini_request(
-        operation,
-        model_name,
+        operation, model_name,
         lambda selected_model: client.models.generate_content(
-            model=selected_model,
-            contents=prompt
-        )
-    )
+            model=selected_model, contents=prompt, config=config))
     return _extract_text(response)
 
 
@@ -348,15 +351,26 @@ def chat_reply(history, message, language="en", subject=None, context=None):
     for item in history:
         if not isinstance(item, dict):
             continue
-        role = "model" if item.get("role") == "assistant" else "user"
-        content = item.get("content")
-        if content:
-            gemini_history.append({"role": role, "parts": [str(content)]})
+        raw_role = item.get("role")
+        role = "model" if raw_role in ("assistant", "model") else "user"
+        text = item.get("text") or item.get("content")
+        if text:
+            gemini_history.append(
+                types.Content(
+                    role=role,
+                    parts=[types.Part.from_text(text=str(text))]
+                )
+            )
 
     prompt = (
-        f"Reply in {language_name}. You are a school tutor for an Indian student. "
+        f"Reply in {language_name}. You are explaining a school topic to a 12-year-old middle school student (Class 5 to 7) in Karnataka, India. "
         f"Subject: {subject or 'General'}. {context or ''}\n"
-        f"Give a clear, age-appropriate educational answer.\n\nStudent question: {message}"
+        "Rules:\n"
+        "1. Use very simple, everyday words—no heavy textbook or college jargon.\n"
+        "2. Keep the entire answer to 3 or 4 short sentences maximum.\n"
+        "3. Give 1 simple real-life example a kid knows (like food, plants, cricket, or kitchen items).\n"
+        "4. Do NOT use Markdown symbols like **, *, or #—use plain text only.\n\n"
+        f"Student question: {message}"
     )
 
     try:
@@ -368,7 +382,7 @@ def chat_reply(history, message, language="en", subject=None, context=None):
                 history=gemini_history
             ).send_message(message=prompt)
         )
-        answer = _extract_text(response)
+        answer = _clean_plain_text(_extract_text(response))
     finally:
         client.close()
 
@@ -381,11 +395,12 @@ def explain_image(image_bytes, mime_type, language="en"):
     client, model_name = _client(timeout=IMAGE_REQUEST_TIMEOUT_SECONDS)
     language_name = _language_name(language)
     prompt = (
-        f"Analyze this school study image and respond in {language_name}. "
+        f"Explain this school study image to a 12-year-old middle school student (Class 5 to 7) in {language_name} using very simple words. "
         "Return a JSON object with exactly these keys: summary, definitions, analogy. "
-        "summary must be an array of 3 short useful points. "
-        "definitions must be an array of important terms and meanings. "
-        "analogy must be a short simple analogy."
+        "summary must be an array of 3 short, easy-to-read sentences (no jargon). "
+        "definitions must be an array of key words explained like you are talking to a kid. "
+        "analogy must be 1 fun everyday comparison (like toys, sports, or cooking). "
+        "Do not use ** or # formatting."
     )
     try:
         response = _run_gemini_request(
@@ -416,21 +431,26 @@ def explain_image(image_bytes, mime_type, language="en"):
         raise AIError("Gemini returned invalid image definitions.")
     if not isinstance(analogy, str):
         raise AIError("Gemini returned invalid image analogy.")
-    return {"summary": summary, "definitions": definitions, "analogy": analogy}
+    return {
+        "summary": [_clean_plain_text(x) for x in summary],
+        "definitions": [_clean_plain_text(x) for x in definitions],
+        "analogy": _clean_plain_text(analogy),
+    }
 
 
 def generate_quiz(class_name, subject, chapter, language="en", context=None):
     client, model_name = _client()
     language_name = _language_name(language)
     prompt = (
-        f"Create exactly 5 multiple-choice questions for Class {class_name} in {language_name}. "
+        f"Create exactly 5 simple multiple-choice questions for a Class {class_name} middle school student (age 11-13) in {language_name}. "
         f"Subject: {subject}. Chapter: {chapter}. {context or ''}\n"
+        "Use clear, simple language suitable for middle school kids. "
         "Return only valid JSON as an array. Each item must contain exactly: "
         'question (string), options (array of exactly 4 strings), answer_index '
-        "(integer from 0 to 3), and explanation (short string)."
+        "(integer from 0 to 3), and explanation (1 short, easy-to-understand sentence)."
     )
     try:
-        text = _generate(client, model_name, prompt, "quiz")
+        text = _generate(client, model_name, prompt, "quiz", json_mode=True)
     finally:
         client.close()
     result = _parse_json(text)
@@ -454,10 +474,10 @@ def generate_quiz(class_name, subject, chapter, language="en", context=None):
         if not isinstance(explanation, str):
             raise AIError("Gemini returned an invalid quiz explanation.")
         quiz.append({
-            "question": question.strip(),
-            "options": [option.strip() for option in options],
+            "question": _clean_plain_text(question),
+            "options": [_clean_plain_text(option) for option in options],
             "answer_index": answer_index,
-            "explanation": explanation.strip()
+            "explanation": _clean_plain_text(explanation),
         })
     return quiz
 
@@ -466,12 +486,13 @@ def generate_summary(class_name, subject, chapter, language="en", context=None):
     client, model_name = _client()
     language_name = _language_name(language)
     prompt = (
-        f"Write a clear educational summary for Class {class_name} in {language_name}. "
+        f"Write a short, easy-to-read revision summary for a Class {class_name} middle school student (age 11-13) in {language_name}. "
         f"Subject: {subject}. Chapter: {chapter}. {context or ''}\n"
-        "Keep it useful for revision and organize it with headings and bullet points."
+        "Use simple everyday words, 4 to 6 short bullet points with '-', and 1 relatable real-life example. "
+        "Do NOT use Markdown symbols like **, *, or #."
     )
     try:
-        summary = _generate(client, model_name, prompt, "summary")
+        summary = _clean_plain_text(_generate(client, model_name, prompt, "summary"))
     finally:
         client.close()
     if not summary:
@@ -485,15 +506,15 @@ def generate_worksheet(class_name, subject, chapter, n_questions, language="en",
         raise AIError("Question count must be a positive integer.")
     client, model_name = _client()
     prompt = (
-        f"Create a worksheet for Class {class_name} in {language_name}. "
+        f"Create a simple practice worksheet for a Class {class_name} middle school student (age 11-13) in {language_name}. "
         f"Subject: {subject}. Chapter: {chapter}. {context or ''}\n"
-        f"Generate exactly {n_questions} questions. "
+        f"Generate exactly {n_questions} short, clear questions using simple words. "
         "Return only valid JSON with title (string), instructions (string), "
         "questions (array of objects containing number, question, answer), "
         "and answer_key (array of strings)."
     )
     try:
-        text = _generate(client, model_name, prompt, "worksheet")
+        text = _generate(client, model_name, prompt, "worksheet", json_mode=True)
     finally:
         client.close()
     result = _parse_json(text)
