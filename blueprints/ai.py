@@ -4,7 +4,7 @@ from io import BytesIO
 
 from PIL import Image, UnidentifiedImageError
 from flask import (Blueprint, render_template, request, redirect,
-                   url_for, flash, g, session, current_app)
+                   url_for, flash, g, session, current_app, send_file, abort)
 
 from auth_utils import role_required
 from models import db, DoubtLog
@@ -170,3 +170,22 @@ def snap():
 
     return render_template("student/snap.html", result=result,
                            selected_language=selected_language)
+
+
+@bp.route("/student/tts")
+@role_required("student")
+def tts():
+    """Reads text aloud (used for Kannada). Returns an mp3."""
+    text = request.args.get("text", "").strip()[:400]
+    if not text:
+        abort(400)
+    lang = "kn" if any("\u0c80" <= ch <= "\u0cff" for ch in text) else "en"
+    try:
+        from gtts import gTTS
+        buf = BytesIO()
+        gTTS(text=text, lang=lang).write_to_fp(buf)
+        buf.seek(0)
+        return send_file(buf, mimetype="audio/mpeg")
+    except Exception:
+        current_app.logger.exception("TTS failed")
+        abort(502)
